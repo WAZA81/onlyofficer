@@ -12,27 +12,27 @@ product:
 connections:
   ## connections.dbType The database type
   ## Possible values are `postgres`, `mariadb` or `mysql`
-  dbType: postgres
+  dbType: mariadb
   ## connections.dbHost The IP address or the name of the Database host
-  dbHost: postgresql
+  dbHost: proxysql
   ## connections.dbUser Database user
-  dbUser: postgres
+  dbUser: nextcloud
   ## connections.dbPort Database server port number
-  dbPort: "5432"
+  dbPort: "3306"
   ## connections.dbName Name of the Database database the application will be connected with
   ## The database must already exist
-  dbName: postgres
+  dbName: onlyoffice
   ## connections.dbExistingSecret Name of existing secret to use for Database passwords
   ## Must contain the key specified in `connections.dbSecretKeyName`
   dbExistingSecret: postgresql
   ## connections.dbSecretKeyName The name of the key that contains the Database user password
   ## If you set a password in `dbPassword`, a secret will be automatically created, the key name of which will be the value set here
-  dbSecretKeyName: postgres-password
+  dbSecretKeyName: onlyoficeDB-password
   ## connections.dbPassword Database user password
   ## If set to, it takes priority over the `connections.dbExistingSecret`
-  dbPassword: ""
+  dbPassword: "QLJ3VpnjvZshGxMI"
   ## connections.redisHost The IP address or the name of the Redis host
-  redisHost: redis-master
+  redisHost: redis-cluster
   ## connections.redisPort The Redis server port number
   redisPort: "6379"
   ## connections.redisUser The Redis user name
@@ -53,7 +53,7 @@ connections:
   ## connections.redisPassword The password set for the Redis account
   ## If set to, it takes priority over the `connections.redisExistingSecret`
   ## The value in this parameter overrides the value set in the `options` object in `local.json` if you add custom configuration file
-  redisPassword: ""
+  redisPassword: "QLJ3VpnjvZshGxMI"
   ## connections.redisNoPass Defines whether to use a Redis auth without a password
   ## If the connection to Redis server does not require a password, set the value to `true`
   redisNoPass: false
@@ -78,7 +78,7 @@ connections:
   amqpSecretKeyName: rabbitmq-password
   ## connections.amqpPassword AMQP server user password
   ## If set to, it takes priority over the `connections.amqpExistingSecret`
-  amqpPassword: ""
+  amqpPassword: "IS6YxUA455ag2nYg"
 ## Web Proxy parameters
 ## Used if your network has a web proxy
 ## ref: https://github.com/ONLYOFFICE/Kubernetes-Docs#10-run-jobs-in-a-private-k8s-cluster-optional
@@ -129,7 +129,7 @@ persistence:
   ## If not specified, a PVC named "ds-files" will be created
   existingClaim: ""
   ## persistence.storageClass PVC Storage Class for Onlyoffice Docs data volume
-  storageClass: "nfs"
+  storageClass: "longhorn"
   ## persistence.size PVC Storage Request for Onlyoffice Docs volume
   size: 8Gi
 ## Configure a Security Context for a Pod
@@ -222,7 +222,7 @@ license:
 log:
   ## log.level Defines the type and severity of a logged event
   ## Possible values are `ALL`, `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, `FATAL`, `MARK`, `OFF`
-  level: WARN
+  level: ALL
   ## log.type Defines the format of a logged event
   ## Possible values are `pattern`, `json`, `basic`, `coloured`, `messagePassThrough`, `dummy`
   type: pattern
@@ -251,7 +251,7 @@ jwt:
   enabled: true
   ## jwt.secret Defines the secret key to validate the JSON Web Token in the request to the ONLYOFFICE Docs
   ## Common for inbox and outbox requests
-  secret: "MYSECRET"
+  secret: "nipa_nextcloud"
   ## jwt.header Defines the http header that will be used to send the JSON Web Token
   ## Common for inbox and outbox requests
   header: "Authorization"
@@ -321,7 +321,7 @@ docservice:
     rollme: "{{ randAlphaNum 5 | quote }}"
   ## docservice.replicas Number of Docservice replicas to deploy
   ## If the `docservice.autoscaling.enabled` parameter is enabled, it is ignored
-  replicas: 2
+  replicas: 1
   ## Update strategy used to replace old Pods by new ones. Allowed values: `RollingUpdate` or `Recreate`
   ## For Docservice deployment, it is recommended to use the `Recreate` type
   ## docservice.updateStrategy.type Docservice deployment update strategy type
@@ -434,6 +434,7 @@ docservice:
     ## https://github.com/ONLYOFFICE/Kubernetes-Docs#4-parameters
     repository: onlyoffice/docs-docservice-de
     ## docservice.image.tag docservice container image tag
+    # tag: 7.4.0-1
     tag: 7.4.0-1
     ## docservice.image.pullPolicy docservice container image pull policy
     pullPolicy: IfNotPresent
@@ -471,7 +472,7 @@ docservice:
     ## docservice.readinessProbe.successThreshold Success threshold for readinessProbe
     successThreshold: 1
     ## docservice.readinessProbe.timeoutSeconds Timeout seconds for readinessProbe
-    timeoutSeconds: 3
+    timeoutSeconds: 100
   ## The parameters below for liveness probes are used only when `docservice.livenessProbe.enabled=true`
   livenessProbe:
     ## docservice.livenessProbe.enabled Enable livenessProbe for docservice container
@@ -488,7 +489,7 @@ docservice:
     ## docservice.livenessProbe.successThreshold Success threshold for livenessProbe
     successThreshold: 1
     ## docservice.livenessProbe.timeoutSeconds Timeout seconds for livenessProbe
-    timeoutSeconds: 3
+    timeoutSeconds: 100
   ## docservice container resource requests and limits
   ## ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
   ## docservice.resources.requests The requested resources for the docservice container
@@ -572,7 +573,7 @@ proxy:
     ## proxy.readinessProbe.successThreshold Success threshold for readinessProbe
     successThreshold: 1
     ## proxy.readinessProbe.timeoutSeconds Timeout seconds for readinessProbe
-    timeoutSeconds: 3
+    timeoutSeconds: 100
   ## The parameters below for liveness probes are used only when `proxy.livenessProbe.enabled=true`
   livenessProbe:
     ## proxy.livenessProbe.enabled Enable livenessProbe for proxy container
@@ -589,7 +590,7 @@ proxy:
     ## proxy.livenessProbe.successThreshold Success threshold for livenessProbe
     successThreshold: 1
     ## proxy.livenessProbe.timeoutSeconds Timeout seconds for livenessProbe
-    timeoutSeconds: 3
+    timeoutSeconds: 100
   ## proxy container resource requests and limits
   ## ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
   ## proxy.resources.requests The requested resources for the proxy container
@@ -614,7 +615,7 @@ converter:
     rollme: "{{ randAlphaNum 5 | quote }}"
   ## converter.replicas Number of Converter replicas to deploy
   ## If the `converter.autoscaling.enabled` parameter is enabled, it is ignored
-  replicas: 2
+  replicas: 1
   ## Update strategy used to replace old Pods by new ones. Allowed values: `RollingUpdate` or `Recreate`
   ## converter.updateStrategy.type Docservice deployment update strategy type
   updateStrategy:
@@ -753,7 +754,7 @@ converter:
 ##
 example:
   ## example.enabled Enables Example installation
-  enabled: false
+  enabled: true
   ## example.dsUrl Onlyoffice Docs external address
   ## It should be changed only if it is necessary to check the operation of the conversion in Example
   ## E.g.
